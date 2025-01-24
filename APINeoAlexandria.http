@@ -1,0 +1,6 @@
+@APINeoAlexandria_HostAddress = http://localhost:5171
+
+GET {{APINeoAlexandria_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
