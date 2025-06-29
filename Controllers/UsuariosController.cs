@@ -104,7 +104,7 @@ namespace APINeoAlexandria.Controllers
         }
 
         [HttpPut("{IdUsuario:int}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> ModificarUsuario([FromBody] Usuarios usuarios, [FromRoute] int IdUsuario)
         {
             try

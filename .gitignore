@@ -1,0 +1,41 @@
+﻿# Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+*.log
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code directories
+.vscode/
+
+# Rider directories
+.idea/
+
+# Visual Studio 2015 cache/options directory
+.vs/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotCover
+*.dotCover
+
+# database files
+*.db
+*.dbcache
+
+# Visual Studio temporary files
+*.tmp
+
+# Others
+*.DS_Store
+*.swp
+
+# Node modules
+node_modules/

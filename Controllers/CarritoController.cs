@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using APINeoAlexandria.Models;
+using APINeoAlexandria.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using APINeoAlexandria.Data;
@@ -67,25 +68,37 @@ namespace APINeoAlexandria.Controllers
         }
 
         [HttpDelete("{IdCarrito:int}")]
-        [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> BorrarCarrito([FromRoute] int IdCarrito)
+        public async Task<IActionResult> BorrarCarrito(int IdCarrito)
         {
+            if (_context.Carritos == null)
+            {
+                return NotFound();
+            }
+
             try
             {
-                var carritoExistente = await _context.Carritos.FindAsync(IdCarrito);
+                var detalles = _context.DetalleCarritos.Where(d => d.IdCarrito == IdCarrito).ToList();
 
-                if (carritoExistente != null)
+                if (detalles.Any())
                 {
-                    _context.Carritos.Remove(carritoExistente);
+                    _context.DetalleCarritos.RemoveRange(detalles);
                     await _context.SaveChangesAsync();
                 }
 
+                var carrito = await _context.Carritos.FindAsync(IdCarrito);
+                if (carrito == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Carritos.Remove(carrito);
+                await _context.SaveChangesAsync();
 
                 return NoContent();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest($"Error al eliminar carrito: {ex.Message} | Inner: {ex.InnerException?.Message}");
             }
         }
 
@@ -114,6 +127,49 @@ namespace APINeoAlexandria.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("CrearConDetalle")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CrearCarritoConDetalle([FromBody] CarritoConDetalleDTO dto)
+        {
+            try
+            {
+                var nuevoCarrito = new Carrito
+                {
+                    IdUsuario = dto.IdUsuario,
+                    PrecioTotalCarrito = dto.PrecioTotalDetalleCarrito,
+                    FechaCreacion = DateTime.Now,
+                    Descripcion = $"Compra del día {DateTime.Now:dd/MM/yyyy}",
+                    Estado = true
+                };
+
+                _context.Carritos.Add(nuevoCarrito);
+                await _context.SaveChangesAsync();
+
+                var nuevoDetalle = new DetalleCarrito
+                {
+                    IdCarrito = nuevoCarrito.IdCarrito,
+                    IdLibro = dto.IdLibro,
+                    PrecioTotalDetalleCarrito = dto.PrecioTotalDetalleCarrito,
+                    FechaFactura = DateTime.Now,
+                    FechaCreacionFactura = DateTime.Now,
+                    DetalleFactura = $"Libro comprado el {DateTime.Now:dd/MM/yyyy}"
+                };
+
+                _context.DetalleCarritos.Add(nuevoDetalle);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    Carrito = nuevoCarrito,
+                    Detalle = nuevoDetalle
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = "Error al crear carrito con detalle", detalle = ex.Message });
             }
         }
     }

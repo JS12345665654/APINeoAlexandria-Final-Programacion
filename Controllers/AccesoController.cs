@@ -23,6 +23,41 @@ namespace APINeoAlexandria.Controllers
         }
 
         [HttpPost]
+        [Route("Registrarse")]
+        public async Task<IActionResult> Registrarse(UsuarioDTO usuario)
+        {
+            var modeloUsuario = new Usuarios
+            {
+                Nombre = usuario.Nombre,
+                Email = usuario.Email,
+                Contrasenia = _Encriptar.encriptarSHA256(usuario.Contrasenia!),
+                Imagen = usuario.Imagen,
+                CategoriaPreferida = usuario.CategoriaPreferida,
+                Rol = usuario.Rol
+            };
+
+            await _TpFinalProgramacionContext.Usuarios.AddAsync(modeloUsuario);
+            await _TpFinalProgramacionContext.SaveChangesAsync();
+
+            if (modeloUsuario.IdUsuario != 0)
+            {
+                var respuesta = new LoginResponseDTO
+                {
+                    Email = modeloUsuario.Email!,
+                    IdRol = modeloUsuario.Rol.ToString(),
+                    Contrasenia = modeloUsuario.Contrasenia,
+                    Autenticado = true
+                };
+
+                return Ok(respuesta);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login(LoginResponseDTO objeto)
         {

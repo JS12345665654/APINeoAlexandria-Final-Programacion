@@ -13,11 +13,11 @@ namespace APINeoAlexandria.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValoriacionUsuariosController : ControllerBase
+    public class ValoracionUsuariosController : ControllerBase
     {
         private readonly TpFinalProgramacionContext _context;
 
-        public ValoriacionUsuariosController(TpFinalProgramacionContext context)
+        public ValoracionUsuariosController(TpFinalProgramacionContext context)
         {
             _context = context;
         }
@@ -37,7 +37,7 @@ namespace APINeoAlexandria.Controllers
             }
         }
 
-        [HttpGet("ObtenerValoriacionesPorId/{IdValoracion:int}")]
+        [HttpGet("ObtenerValoracionesPorId/{IdValoracion:int}")]
         [AllowAnonymous]
         public async Task<IActionResult> ObtenerValoracionesPorId([FromRoute(Name = "IdValoracion")] int id)
         {
@@ -128,5 +128,26 @@ namespace APINeoAlexandria.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("PorLibro/{idLibro}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ValoraciondeUsuario>>> GetValoracionesPorLibro(int idLibro)
+        {
+            try
+            {
+                var valoraciones = await _context.ValoraciondeUsuarios
+                    .Where(v => v.IdLibro == idLibro)
+                    .ToListAsync();
+
+                if (valoraciones == null || valoraciones.Count == 0)
+                    return NotFound("No se encontraron valoraciones para este libro.");
+
+                return Ok(valoraciones);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener las valoraciones: {ex.Message}");
+            }
+        }
+
     }
 }

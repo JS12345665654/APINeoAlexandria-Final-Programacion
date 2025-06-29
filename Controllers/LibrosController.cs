@@ -5,7 +5,8 @@ using APINeoAlexandria.Data;
 using APINeoAlexandria.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-namespace ApiStore.Controllers;
+
+namespace APINeoAlexandria.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

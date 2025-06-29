@@ -57,6 +57,16 @@ namespace APINeoAlexandria.Controllers
         {
             try
             {
+                var detalleCarrito = new DetalleCarrito()
+                {
+                    IdDetalleCarrito = detallecarrito.IdDetalleCarrito,
+                    PrecioTotalDetalleCarrito = detallecarrito.PrecioTotalDetalleCarrito,
+                    IdCarrito = detallecarrito.IdCarrito,
+                    FechaFactura = detallecarrito.FechaFactura,
+                    IdLibro = detallecarrito.IdLibro,
+                    DetalleFactura = detallecarrito.DetalleFactura,
+                    FechaCreacionFactura = detallecarrito.FechaCreacionFactura,
+                };
                 await _context.DetalleCarritos.AddAsync(detallecarrito);
                 var result = await _context.SaveChangesAsync();
 
@@ -92,7 +102,7 @@ namespace APINeoAlexandria.Controllers
         }
 
         [HttpPut("{IdDetalleCarrito:int}")]
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         public async Task<IActionResult> ModificarDetalleCarrito([FromBody] DetalleCarrito detallecarrito, [FromRoute] int IdDetalleCarrito)
         {
             try
